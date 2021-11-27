@@ -1,0 +1,49 @@
+{
+	"experiment_description": "chestxray_baseline",
+	"image_root" : "/home/woody/iwi5/iwi5014h/chestxray/images",
+	"covid_data_save_path":"./output/covid_output.txt",
+	"main_data_save_path":"./output/main_output.txt",
+    "csv_train" : "/home/woody/iwi5/iwi5014h/chestxray/csv_files/train1.csv",
+    "csv_val" : "/home/woody/iwi5/iwi5014h/chestxray/csv_files/val1.csv",
+    "csv_test" : "/home/woody/iwi5/iwi5014h/chestxray/csv_files/test.csv",
+	"csv_train_singles" : "/home/woody/iwi5/iwi5014h/chestxray/csv_files/train_singles1.csv",
+    "csv_val_singles" : "/home/woody/iwi5/iwi5014h/chestxray/csv_files/val_singles1.csv",
+    "csv_test_singles" : "/home/woody/iwi5/iwi5014h/chestxray/csv_files/test_singles.csv",
+	"best_model_path" : "/home/woody/iwi5/iwi5014h/chestxray/single0/end0/fold1/models/chestxray_best_model.pth",
+	"log_path":"/home/woody/iwi5/iwi5014h/chestxray/single0/end0/fold1/log/",
+	"checkpoint_path":"/home/woody/iwi5/iwi5014h/chestxray/single0/end0/fold1/checkpoints/intermediate",
+	"num_workers": 4,
+	"input_size": 256,
+	"param_bounds": {
+	"weight_decay" : [-8,-1],
+    "learning_rate" :[-8,-1],
+	"neg_margin": [0,2],
+	"pos_margin": [0,2]
+	},
+    "batch_size" : 32,
+	"num_epochs":50,
+	"pruning": true,
+	"patience": 4,
+	"checkpoint_path":null,
+	"singleton_percentage":0.0,
+	"singleton_percentage_end":0.0,
+	"keep_singletons":true,
+	"initial_trial1": {
+		"neg_margin": 1,
+		"pos_margin": 0,
+		"weight_decay" : -5,
+		"learning_rate" :-5
+	},
+	"initial_trial1": {
+		"neg_margin": 1,
+		"pos_margin": 0,
+		"weight_decay" : -4,
+		"learning_rate" :-3
+	},
+	"intermediate_save": {
+		"neg_margin": null,
+		"pos_margin": null,
+		"weight_decay" : null,
+		"learning_rate" :null
+	}
+}
