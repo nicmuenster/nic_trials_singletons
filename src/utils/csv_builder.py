@@ -110,8 +110,8 @@ if __name__ == "__main__":
     if args.experiment_name == 'chestxray':
         rename_dict = {'Image Name': 'Image Index', 'Label': 'Patient ID'}
     folder_path = args.folder_path + args.experiment_name
-    if not (os.path.exists(folder_path)):
-        os.mkdir(folder_path)
+    if not (os.path.exists(folder_path + '_csv')):
+        os.mkdir(folder_path + '_csv')
 
     orig_path = args.csv_path
     dest_many = "./many_images.csv"
@@ -119,12 +119,12 @@ if __name__ == "__main__":
     split_singulars_chest(orig_path, dest_many, dest_singles, rename_dict=rename_dict)
     testset_split(dest_singles, dest_path='./', singles=True)
     testset_split(dest_many, dest_path='./', singles=False)
-    fold_split(file_path='./training_data.csv', dest_path='./chestxray/', num_folds=5, singles=False)
-    fold_split(file_path='./training_data_singles.csv', dest_path='./chestxray/', num_folds=5, singles=True)
-    for file in os.listdir('./chestxray/'):
-        remove_other_entries('./chestxray/' + file, new_path=None)
+    fold_split(file_path='./training_data.csv', dest_path='./chestxray_csv/', num_folds=5, singles=False)
+    fold_split(file_path='./training_data_singles.csv', dest_path='./chestxray_csv/', num_folds=5, singles=True)
+    for file in os.listdir('./chestxray_csv/'):
+        remove_other_entries('./chestxray_csv/' + file, new_path=None)
         print(file)
-        get_statistics('./chestxray/' + file)
+        get_statistics('./chestxray_csv/' + file)
     print("test")
     get_statistics('./test.csv')
     print("test_singles")

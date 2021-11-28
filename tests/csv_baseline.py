@@ -2,8 +2,6 @@ import argparse
 import os
 from typing import List
 from typing import Optional
-import optuna
-from optuna.integration import PyTorchLightningPruningCallback
 import pytorch_lightning as pl
 from src.models import CompleteModel
 from src.networks.extractor import ExtractorRes50
@@ -19,16 +17,12 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 
 
 
-def save_model_weights(bayes_opt, current_result, model, model_path):
-    if (bayes_opt.max["target"] <= current_result):
-        torch.save(model.model.state_dict(),
-                   model_path)
 
 
 if __name__ == "__main__":
     # define an argument parser
-    parser = argparse.ArgumentParser('Patient Retrieval Phase1')
-    parser.add_argument('--config_path', default='./config_files/', help='the path where the config files are stored')
+    parser = argparse.ArgumentParser('Singleton Retrieval')
+    parser.add_argument('--config_path', default='./', help='the path where the config files are stored')
     parser.add_argument('--config', default='config.json',
                         help='the hyper-parameter configuration and experiment settings')
     args = parser.parse_args()
@@ -45,8 +39,8 @@ if __name__ == "__main__":
     max_num_trials = 50
     from pathlib import Path
 
-    hyperframe_path = Path(config["hyper_csv"])
-    if hyperframe_path.is_file():
+    hyperframe_path = config["hyper_csv"]
+    if os.path.exists(config["hyper_csv"]):
         hyperframe = pd.from_csv(hyperframe_path)
     # file exists
     else:
@@ -73,6 +67,7 @@ if __name__ == "__main__":
             filename=config["checkpoint_name"])
         trainer = pl.Trainer(
             logger=True,
+            default_root_dir=config["log_path"],
             resume_from_checkpoint=checkpoint,
             callbacks=[checkpoint_callback],
             progress_bar_refresh_rate=500,
@@ -98,7 +93,8 @@ if __name__ == "__main__":
                    config["best_model_path"])
         hyperframe  = pd.DataFrame(result)
         hyperframe.to_csv(hyperframe_path)
-        os.remove(config["checkpoint_path"])
+        if os.path.exists(config["checkpoint_path"]):
+            os.remove(config["checkpoint_path"])
 
 
 
@@ -122,6 +118,7 @@ if __name__ == "__main__":
             filename=config["checkpoint_name"])
         trainer = pl.Trainer(
             logger=True,
+            default_root_dir=config["log_path"],
             resume_from_checkpoint=checkpoint,
             callbacks=[checkpoint_callback],
             progress_bar_refresh_rate=500,
@@ -151,7 +148,8 @@ if __name__ == "__main__":
 
         hyperframe = pd.concat(frame_list)
         hyperframe.to_csv(hyperframe_path)
-        os.remove(config["checkpoint_path"])
+        if os.path.exists(config["checkpoint_path"]):
+            os.remove(config["checkpoint_path"])
 
 
     bayes_opt = BayesianOptimization(
@@ -197,6 +195,7 @@ if __name__ == "__main__":
         filename = config["checkpoint_name"])
         trainer = pl.Trainer(
             logger=True,
+            default_root_dir=config["log_path"],
             resume_from_checkpoint=checkpoint,
             callbacks=[checkpoint_callback],
             progress_bar_refresh_rate=500,

@@ -24,7 +24,7 @@
 	"pos_margin": [0,2]
 	},
     "batch_size" : 32,
-	"num_epochs":50,
+	"num_epochs":30,
 	"pruning": true,
 	"patience": 4,
 	"singleton_percentage":0.0,
