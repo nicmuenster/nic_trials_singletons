@@ -1,5 +1,7 @@
 import argparse
 import os
+import sys
+sys.path.insert(0, '/home/hpc/iwi5/iwi5014h/nic_paper_singletons/')
 from typing import List
 from typing import Optional
 import pytorch_lightning as pl
