@@ -58,7 +58,7 @@ if __name__ == "__main__":
         extractor = ExtractorRes50()
         head = SimpleHead()
 
-        loss_func = losses.ContrastiveLoss(**config["initial_trial1"])
+        loss_func = losses.ContrastiveLoss(neg_margin=config["initial_trial1"]["neg_margin"], pos_margin=config["initial_trial1"]["pos_margin"])
         model = CompleteModel(extractor, head, loss_func, datamodule.val_set, learning_rate=10^config["initial_trial1"]["learning_rate"],
                               weight_decay=10^config["initial_trial1"]["weight_decay"])
         checkpoint = config["checkpoint_path"] if os.path.exists(config["checkpoint_path"]) else None
@@ -107,7 +107,7 @@ if __name__ == "__main__":
         extractor = ExtractorRes50()
         head = SimpleHead()
 
-        loss_func = losses.ContrastiveLoss(**config["initial_trial2"])
+        loss_func = losses.ContrastiveLoss(neg_margin=config["initial_trial2"]["neg_margin"], pos_margin=config["initial_trial2"]["pos_margin"])
         model = CompleteModel(extractor, head, loss_func, datamodule.val_set,
                               learning_rate=10 ^ config["initial_trial2"]["learning_rate"],
                               weight_decay=10 ^ config["initial_trial2"]["weight_decay"])
@@ -185,7 +185,7 @@ if __name__ == "__main__":
         extractor = ExtractorRes50()
         head = SimpleHead()
         checkpoint = config["checkpoint_path"] if os.path.exists(config["checkpoint_path"]) else None
-        loss_func = losses.ContrastiveLoss(**config["intermediate_save"])
+        loss_func = losses.ContrastiveLoss(neg_margin=config["intermediate_save"]["neg_margin"], pos_margin=config["intermediate_save"]["pos_margin"])
         model = CompleteModel(extractor, head, loss_func, datamodule.val_set,
                               learning_rate=10 ^ config["intermediate_save"]["learning_rate"],
                               weight_decay=10 ^ config["intermediate_save"]["weight_decay"])
