@@ -61,8 +61,8 @@ if __name__ == "__main__":
         head = SimpleHead()
 
         loss_func = losses.ContrastiveLoss(neg_margin=config["initial_trial1"]["neg_margin"], pos_margin=config["initial_trial1"]["pos_margin"])
-        model = CompleteModel(extractor, head, loss_func, datamodule.val_set, learning_rate=10^config["initial_trial1"]["learning_rate"],
-                              weight_decay=10^config["initial_trial1"]["weight_decay"])
+        model = CompleteModel(extractor, head, loss_func, datamodule.val_set, learning_rate=10**config["initial_trial1"]["learning_rate"],
+                              weight_decay=10**config["initial_trial1"]["weight_decay"])
         checkpoint = config["checkpoint_path"] if os.path.exists(config["checkpoint_path"]) else None
         checkpoint_callback = ModelCheckpoint(
             dirpath=config["checkpoint_folder"],
@@ -78,15 +78,15 @@ if __name__ == "__main__":
             precision=16,
             gpus=1 if torch.cuda.is_available() else None,
         )
-        hyperparameters = dict(learning_rate=10 ^ config["initial_trial1"]["learning_rate"],
-                               weight_decay=10 ^ config["initial_trial1"]["weight_decay"],
+        hyperparameters = dict(learning_rate=10 ** config["initial_trial1"]["learning_rate"],
+                               weight_decay=10 ** config["initial_trial1"]["weight_decay"],
                                neg_margin=config["initial_trial1"]["neg_margin"],
                                pos_margin=config["initial_trial1"]["pos_margin"])
         trainer.logger.log_hyperparams(hyperparameters)
         trainer.fit(model, datamodule=datamodule)
 
-        result = dict(learning_rate=[10 ^ config["initial_trial1"]["learning_rate"]],
-               weight_decay=[10 ^ config["initial_trial1"]["weight_decay"]],
+        result = dict(learning_rate=[10 ** config["initial_trial1"]["learning_rate"]],
+               weight_decay=[10 ** config["initial_trial1"]["weight_decay"]],
                neg_margin=[config["initial_trial1"]["neg_margin"]],
                pos_margin=[config["initial_trial1"]["pos_margin"]],
                         result=[trainer.callback_metrics["MAP@R"].item()])
@@ -111,8 +111,8 @@ if __name__ == "__main__":
 
         loss_func = losses.ContrastiveLoss(neg_margin=config["initial_trial2"]["neg_margin"], pos_margin=config["initial_trial2"]["pos_margin"])
         model = CompleteModel(extractor, head, loss_func, datamodule.val_set,
-                              learning_rate=10 ^ config["initial_trial2"]["learning_rate"],
-                              weight_decay=10 ^ config["initial_trial2"]["weight_decay"])
+                              learning_rate=10 ** config["initial_trial2"]["learning_rate"],
+                              weight_decay=10 ** config["initial_trial2"]["weight_decay"])
         # TODO fill in clause for case of resumed training
         checkpoint = config["checkpoint_path"] if os.path.exists(config["checkpoint_path"]) else None
         checkpoint_callback = ModelCheckpoint(
@@ -189,8 +189,8 @@ if __name__ == "__main__":
         checkpoint = config["checkpoint_path"] if os.path.exists(config["checkpoint_path"]) else None
         loss_func = losses.ContrastiveLoss(neg_margin=config["intermediate_save"]["neg_margin"], pos_margin=config["intermediate_save"]["pos_margin"])
         model = CompleteModel(extractor, head, loss_func, datamodule.val_set,
-                              learning_rate=10 ^ config["intermediate_save"]["learning_rate"],
-                              weight_decay=10 ^ config["intermediate_save"]["weight_decay"])
+                              learning_rate=10 ** config["intermediate_save"]["learning_rate"],
+                              weight_decay=10 ** config["intermediate_save"]["weight_decay"])
         # TODO fill in clause for case of resumed training
         checkpoint_callback = ModelCheckpoint(
         dirpath = config["checkpoint_folder"],
