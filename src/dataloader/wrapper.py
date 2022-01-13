@@ -52,7 +52,7 @@ class miningDataset(data.Dataset):
         return self.num_samples
 
 class miningDataset_debug(data.Dataset):
-    def __init__(self, root, csv_many, csv_singles, train, bucket_size=8,singleton_percentage=1.0,
+    def __init__(self, root, csv_many, csv_singles, train, bucket_size=8, singleton_percentage=1.0,
                  singleton_percentage_end=0.0, keep_singletons=True, input_size=256):
         self.root = root
         self.train = train
@@ -95,8 +95,8 @@ class basicDataset(data.Dataset):
 
         name_array = patient_data_frame['Image Name'].to_numpy()
         id_array = patient_data_frame['Label'].to_numpy()
-        single_name_array = patient_data_frame['Image Name'].to_numpy()
-        single_id_array = patient_data_frame['Label'].to_numpy()
+        single_name_array = single_data_frame['Image Name'].to_numpy()
+        single_id_array = single_data_frame['Label'].to_numpy()
         self.id_array = np.array(list(single_id_array) + list(id_array))
         self.name_array = np.array(list(single_name_array) + list(name_array))
         self.num_samples = len(self.name_array)
@@ -149,7 +149,8 @@ class MiningDataModule(pl.LightningDataModule):
                  singleton_percentage=1.0,
                  singleton_percentage_end=0.0,
                  keep_singletons=True,
-                 input_size=256
+                 input_size=256,
+                 **kwargs
                  ):
         super().__init__()
         self.root_images = image_root

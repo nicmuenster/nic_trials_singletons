@@ -52,7 +52,7 @@ class CompleteModel(pl.LightningModule):
                                         weight_decay=self.hparams.weight_decay)
 
 
-        return [optimizer],
+        return [optimizer]
 
     def training_step(self, batch, batch_idx):
         inputs, labels = batch

@@ -20,7 +20,7 @@ if __name__ == "__main__":
     # parse config
     config = json.loads(config)
     config["data_set"] = args.experiment_name
-    config["experiment_root"] = "/mnt/c/Users/nicmu/Desktop/testordner/"
+    #config["experiment_root"] = "/mnt/c/Users/nicmu/Desktop/testordner/"
     config["image_root"] = config["experiment_root"] + args.experiment_name + "/images/"
     config["csv_train"] = config["experiment_root"] + args.experiment_name + config["csv_train"]
     config["csv_val"] = config["experiment_root"] + args.experiment_name + config["csv_val"]
@@ -59,10 +59,10 @@ if __name__ == "__main__":
                 intermediate_config["checkpoint_folder"] = path3 + "/"
                 intermediate_config["checkpoint_path"] = path3 + "/" + args.experiment_name + \
                                                          str(current_num) + "_" + str(current_inner_num) + \
-                                                         "_intermediate.ckpt"
+                                                         "_intermediate"
                 intermediate_config["checkpoint_name"] = args.experiment_name + \
                                                          str(current_num) + "_" + str(current_inner_num) + \
-                                                         "_intermediate.ckpt"
+                                                         "_intermediate"
                 intermediate_config["best_model_path"] = path3 + "/" +  args.experiment_name + \
                                                          str(current_num) + "_" + str(current_inner_num) \
                                                          + "_best_model.pth"
