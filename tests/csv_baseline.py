@@ -16,6 +16,7 @@ import pandas as pd
 from bayes_opt import BayesianOptimization
 from bayes_opt import UtilityFunction
 from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 
 
@@ -67,26 +68,31 @@ if __name__ == "__main__":
         checkpoint_callback = ModelCheckpoint(
             dirpath=config["checkpoint_folder"],
             filename=config["checkpoint_name"])
+        early_stop_callback = EarlyStopping(monitor="MAP@R", min_delta=0.005, patience=config["patience"], verbose=False,
+                                            mode="max",
+                                            divergence_threshold=0.05)
         trainer = pl.Trainer(
             logger=True,
             default_root_dir=config["log_path"],
             resume_from_checkpoint=checkpoint,
-            callbacks=[checkpoint_callback],
+            max_epochs=50,
+            min_epochs=20,
+            callbacks=[checkpoint_callback, early_stop_callback],
             progress_bar_refresh_rate=500,
             val_check_interval=1.0,
             deterministic=True,
             precision=16,
             gpus=1 if torch.cuda.is_available() else None,
         )
-        hyperparameters = dict(learning_rate=10 ** config["initial_trial1"]["learning_rate"],
-                               weight_decay=10 ** config["initial_trial1"]["weight_decay"],
+        hyperparameters = dict(learning_rate=config["initial_trial1"]["learning_rate"],
+                               weight_decay=config["initial_trial1"]["weight_decay"],
                                neg_margin=config["initial_trial1"]["neg_margin"],
                                pos_margin=config["initial_trial1"]["pos_margin"])
         trainer.logger.log_hyperparams(hyperparameters)
         trainer.fit(model, datamodule=datamodule)
 
-        result = dict(learning_rate=[10 ** config["initial_trial1"]["learning_rate"]],
-               weight_decay=[10 ** config["initial_trial1"]["weight_decay"]],
+        result = dict(learning_rate=[config["initial_trial1"]["learning_rate"]],
+               weight_decay=[config["initial_trial1"]["weight_decay"]],
                neg_margin=[config["initial_trial1"]["neg_margin"]],
                pos_margin=[config["initial_trial1"]["pos_margin"]],
                         result=[trainer.callback_metrics["MAP@R"].item()])
@@ -118,11 +124,17 @@ if __name__ == "__main__":
         checkpoint_callback = ModelCheckpoint(
             dirpath=config["checkpoint_folder"],
             filename=config["checkpoint_name"])
+        early_stop_callback = EarlyStopping(monitor="MAP@R", min_delta=0.005,
+                                            patience=config["patience"], verbose=False,
+                                            mode="max",
+                                            divergence_threshold=0.05)
         trainer = pl.Trainer(
             logger=True,
             default_root_dir=config["log_path"],
             resume_from_checkpoint=checkpoint,
-            callbacks=[checkpoint_callback],
+            max_epochs=50,
+            min_epochs=20,
+            callbacks=[checkpoint_callback, early_stop_callback],
             progress_bar_refresh_rate=500,
             val_check_interval=1.0,
             deterministic=True,
@@ -141,7 +153,7 @@ if __name__ == "__main__":
                       neg_margin=config["initial_trial2"]["neg_margin"],
                       pos_margin=config["initial_trial2"]["pos_margin"],
                       result=trainer.callback_metrics["MAP@R"].item())
-        if (hyperframe["result"].to_list()[-1] <= result["result"]):
+        if hyperframe["result"].to_list()[-1] <= result["result"]:
             torch.save(model.model.state_dict(),
                        config["best_model_path"])
         result = pd.DataFrame(result)
@@ -195,11 +207,17 @@ if __name__ == "__main__":
         checkpoint_callback = ModelCheckpoint(
         dirpath = config["checkpoint_folder"],
         filename = config["checkpoint_name"])
+        early_stop_callback = EarlyStopping(monitor="MAP@R", min_delta=0.005,
+                                            patience=config["patience"], verbose=False,
+                                            mode="max",
+                                            divergence_threshold=0.05)
         trainer = pl.Trainer(
             logger=True,
             default_root_dir=config["log_path"],
             resume_from_checkpoint=checkpoint,
-            callbacks=[checkpoint_callback],
+            max_epochs=50,
+            min_epochs=20,
+            callbacks=[checkpoint_callback, early_stop_callback],
             progress_bar_refresh_rate=500,
             val_check_interval=1.0,
             deterministic=True,
