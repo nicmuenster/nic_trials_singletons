@@ -148,11 +148,11 @@ if __name__ == "__main__":
         trainer.logger.log_hyperparams(hyperparameters)
         trainer.fit(model, datamodule=datamodule)
 
-        result = dict(learning_rate=config["initial_trial2"]["learning_rate"],
-                      weight_decay=config["initial_trial2"]["weight_decay"],
-                      neg_margin=config["initial_trial2"]["neg_margin"],
-                      pos_margin=config["initial_trial2"]["pos_margin"],
-                      result=trainer.callback_metrics["MAP@R"].item())
+        result = dict(learning_rate=[config["initial_trial2"]["learning_rate"]],
+                      weight_decay=[config["initial_trial2"]["weight_decay"]],
+                      neg_margin=[config["initial_trial2"]["neg_margin"]],
+                      pos_margin=[config["initial_trial2"]["pos_margin"]],
+                      result=[trainer.callback_metrics["MAP@R"].item()])
         if hyperframe["result"].to_list()[-1] <= result["result"]:
             torch.save(model.model.state_dict(),
                        config["best_model_path"])
@@ -205,8 +205,8 @@ if __name__ == "__main__":
                               weight_decay=10 ** config["intermediate_save"]["weight_decay"])
         # TODO fill in clause for case of resumed training
         checkpoint_callback = ModelCheckpoint(
-        dirpath = config["checkpoint_folder"],
-        filename = config["checkpoint_name"])
+        dirpath=config["checkpoint_folder"],
+        filename=config["checkpoint_name"])
         early_stop_callback = EarlyStopping(monitor="MAP@R", min_delta=0.005,
                                             patience=config["patience"], verbose=False,
                                             mode="max",
@@ -231,11 +231,11 @@ if __name__ == "__main__":
         trainer.logger.log_hyperparams(hyperparameters)
         trainer.fit(model, datamodule=datamodule)
 
-        result = dict(learning_rate=new_hyperparams["learning_rate"],
-                      weight_decay=new_hyperparams["weight_decay"],
-                      neg_margin=new_hyperparams["neg_margin"],
-                      pos_margin=new_hyperparams["pos_margin"],
-                      result=trainer.callback_metrics["MAP@R"].item())
+        result = dict(learning_rate=[new_hyperparams["learning_rate"]],
+                      weight_decay=[new_hyperparams["weight_decay"]],
+                      neg_margin=[new_hyperparams["neg_margin"]],
+                      pos_margin=[new_hyperparams["pos_margin"]],
+                      result=[trainer.callback_metrics["MAP@R"].item()])
         resultdf = pd.DataFrame(result)
         frame_list = [hyperframe, resultdf]
         hyperframe = pd.concat(frame_list)
@@ -244,10 +244,10 @@ if __name__ == "__main__":
             torch.save(model.model.state_dict(),
                        config["best_model_path"])
 
-        params = {"learning_rate": result["learning_rate"],
-                  "weight_decay": result["weight_decay"],
-                  "neg_margin": result["neg_margin"],
-                  "pos_margin": result["pos_margin"], }
+        params = {"learning_rate": result["learning_rate"][0],
+                  "weight_decay": result["weight_decay"][0],
+                  "neg_margin": result["neg_margin"][0],
+                  "pos_margin": result["pos_margin"][0], }
         config["checkpoint"] = False
         with open(args.config_path + args.config, "w") as config_out:
             json.dump(config, config_out)
