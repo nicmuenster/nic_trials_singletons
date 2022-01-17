@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     hyperframe_path = config["hyper_csv"]
     if os.path.exists(config["hyper_csv"]):
-        hyperframe = pd.from_csv(hyperframe_path)
+        hyperframe = pd.read_csv(hyperframe_path)
     # file exists
     else:
         hyperframe = pd.DataFrame(dict(learning_rate=[],
