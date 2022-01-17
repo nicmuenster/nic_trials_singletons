@@ -10,6 +10,7 @@ from src.networks.extractor import ExtractorRes50
 from src.networks.heads import SimpleHead
 from pytorch_metric_learning import losses
 from src.dataloader.wrapper import MiningDataModule
+from src.utils.utils import condense_checkpoints
 import torch
 import json
 import pandas as pd
@@ -38,7 +39,6 @@ if __name__ == "__main__":
     # parse config
     config = json.loads(config)
 
-
     max_num_trials = 50
     from pathlib import Path
 
@@ -52,7 +52,7 @@ if __name__ == "__main__":
                       neg_margin=[],
                       pos_margin=[],
                       result=[]))
-
+    condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
 
     if len(hyperframe["result"]) == 0:
 
@@ -76,7 +76,7 @@ if __name__ == "__main__":
             default_root_dir=config["log_path"],
             resume_from_checkpoint=checkpoint,
             max_epochs=50,
-            min_epochs=20,
+            min_epochs=15,
             callbacks=[checkpoint_callback, early_stop_callback],
             progress_bar_refresh_rate=500,
             val_check_interval=1.0,
@@ -101,6 +101,8 @@ if __name__ == "__main__":
                    config["best_model_path"])
         hyperframe  = pd.DataFrame(result)
         hyperframe.to_csv(hyperframe_path)
+        condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
+
         if os.path.exists(config["checkpoint_path"]):
             os.remove(config["checkpoint_path"])
 
@@ -120,6 +122,7 @@ if __name__ == "__main__":
                               learning_rate=10 ** config["initial_trial2"]["learning_rate"],
                               weight_decay=10 ** config["initial_trial2"]["weight_decay"])
         # TODO fill in clause for case of resumed training
+        condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
         checkpoint = config["checkpoint_path"] if os.path.exists(config["checkpoint_path"]) else None
         checkpoint_callback = ModelCheckpoint(
             dirpath=config["checkpoint_folder"],
@@ -162,6 +165,8 @@ if __name__ == "__main__":
 
         hyperframe = pd.concat(frame_list)
         hyperframe.to_csv(hyperframe_path)
+        condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
+
         if os.path.exists(config["checkpoint_path"]):
             os.remove(config["checkpoint_path"])
 
@@ -180,7 +185,7 @@ if __name__ == "__main__":
                   "neg_margin": entry["neg_margin"],
                   "pos_margin": entry["pos_margin"], }
         bayes_opt.register(params=params, target=entry["result"])
-
+    condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
     if not (os.path.exists(config["checkpoint_path"]) or config["checkpoint"]):
         new_hyperparams = bayes_opt.suggest(utility)
         config["intermediate_save"] = new_hyperparams
@@ -198,6 +203,7 @@ if __name__ == "__main__":
         datamodule.setup("fit")
         extractor = ExtractorRes50()
         head = SimpleHead()
+        condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
         checkpoint = config["checkpoint_path"] if os.path.exists(config["checkpoint_path"]) else None
         loss_func = losses.ContrastiveLoss(neg_margin=config["intermediate_save"]["neg_margin"], pos_margin=config["intermediate_save"]["pos_margin"])
         model = CompleteModel(extractor, head, loss_func, datamodule.val_set,
@@ -251,6 +257,7 @@ if __name__ == "__main__":
         config["checkpoint"] = False
         with open(args.config_path + args.config, "w") as config_out:
             json.dump(config, config_out)
+        condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
         os.remove(config["checkpoint_path"])
         bayes_opt.register(params=params, target=entry["result"])
         new_hyperparams = bayes_opt.suggest(utility)
