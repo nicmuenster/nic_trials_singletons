@@ -156,7 +156,7 @@ if __name__ == "__main__":
                       neg_margin=[config["initial_trial2"]["neg_margin"]],
                       pos_margin=[config["initial_trial2"]["pos_margin"]],
                       result=[trainer.callback_metrics["MAP@R"].item()])
-        if hyperframe["result"].to_list()[-1] <= result["result"]:
+        if hyperframe["result"].to_list()[-1] <= result["result"][-1]:
             torch.save(model.model.state_dict(),
                        config["best_model_path"])
         result = pd.DataFrame(result)
@@ -246,7 +246,7 @@ if __name__ == "__main__":
         frame_list = [hyperframe, resultdf]
         hyperframe = pd.concat(frame_list)
         hyperframe.to_csv(hyperframe_path)
-        if (bayes_opt.max["target"] <= result["result"]):
+        if (bayes_opt.max["target"] <= result["result"][-1]):
             torch.save(model.model.state_dict(),
                        config["best_model_path"])
 
