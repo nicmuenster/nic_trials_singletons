@@ -59,7 +59,7 @@ if __name__ == "__main__":
                 intermediate_config["checkpoint_folder"] = path3 + "/"
                 intermediate_config["checkpoint_path"] = path3 + "/" + args.experiment_name + \
                                                          str(current_num) + "_" + str(current_inner_num) + \
-                                                         "_intermediate"
+                                                         "_intermediate.ckpt"
                 intermediate_config["checkpoint_name"] = args.experiment_name + \
                                                          str(current_num) + "_" + str(current_inner_num) + \
                                                          "_intermediate"
