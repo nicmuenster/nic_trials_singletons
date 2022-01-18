@@ -40,6 +40,7 @@ if __name__ == "__main__":
     config = json.loads(config)
 
     max_num_trials = 50
+    #config["num_iter"] = max_num_trials
     from pathlib import Path
 
     hyperframe_path = config["hyper_csv"]

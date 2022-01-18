@@ -16,6 +16,7 @@
 	"hyper_csv":"hyperparameter.csv",
 	"checkpoint": false,
 	"num_workers": 4,
+	"num_iter": 50,
 	"input_size": 256,
 	"param_bounds": {
 	"weight_decay" : [-8,-1],
