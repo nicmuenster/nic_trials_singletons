@@ -198,6 +198,7 @@ if __name__ == "__main__":
 
 
 
+
     for x in range(config["num_iter"] - len(hyperframe)):
 
         datamodule = MiningDataModule(**config)
@@ -231,6 +232,8 @@ if __name__ == "__main__":
             precision=16,
             gpus=1 if torch.cuda.is_available() else None,
         )
+        if not new_hyperparams:
+            new_hyperparams = config["intermediate_save"]
         hyperparameters = dict(learning_rate=new_hyperparams["learning_rate"],
                                weight_decay=new_hyperparams["weight_decay"],
                                neg_margin=new_hyperparams["neg_margin"],
