@@ -42,7 +42,8 @@ if __name__ == "__main__":
     max_num_trials = 50
     #config["num_iter"] = max_num_trials
     from pathlib import Path
-
+    # so if not new_hyperparams works
+    new_hyperparams = []
     hyperframe_path = config["hyper_csv"]
     if os.path.exists(config["hyper_csv"]):
         hyperframe = pd.read_csv(hyperframe_path)
@@ -262,7 +263,8 @@ if __name__ == "__main__":
         with open(args.config_path + args.config, "w") as config_out:
             json.dump(config, config_out)
         condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
-        os.remove(config["checkpoint_path"])
+        if os.path.exists(config["checkpoint_path"]):
+            os.remove(config["checkpoint_path"])
         bayes_opt.register(params=params, target=entry["result"])
         new_hyperparams = bayes_opt.suggest(utility)
         config["intermediate_save"] = new_hyperparams
