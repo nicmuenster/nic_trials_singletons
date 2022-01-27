@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+
 sys.path.insert(0, '/home/hpc/iwi5/iwi5014h/nic_paper_singletons/')
 from typing import List
 from typing import Optional
@@ -19,10 +20,6 @@ from bayes_opt import UtilityFunction
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
-
-
-
-
 if __name__ == "__main__":
     # define an argument parser
     parser = argparse.ArgumentParser('Singleton Retrieval')
@@ -39,38 +36,47 @@ if __name__ == "__main__":
     # parse config
     config = json.loads(config)
 
+    # for the moment, the amount of optimization steps is initialized here. Not pretty but works fine
+    # for the moment and easier than current alternatives. Candidate to be changed later on.
     max_num_trials = 50
-    #config["num_iter"] = max_num_trials
-    from pathlib import Path
+    # config["num_iter"] = max_num_trials
+
     # so if not new_hyperparams works
     new_hyperparams = []
     hyperframe_path = config["hyper_csv"]
+    # file exists
     if os.path.exists(config["hyper_csv"]):
         hyperframe = pd.read_csv(hyperframe_path)
-    # file exists
+    # else create csv file for bayesian optimization
     else:
         hyperframe = pd.DataFrame(dict(learning_rate=[],
-                      weight_decay=[],
-                      neg_margin=[],
-                      pos_margin=[],
-                      result=[]))
+                                       weight_decay=[],
+                                       neg_margin=[],
+                                       pos_margin=[],
+                                       result=[]))
+    # rename last checkpoint if necessary
     condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
-
+    # first iteration with given hyperparams
     if len(hyperframe["result"]) == 0:
-
+        # init data module and inner network
         datamodule = MiningDataModule(**config)
         datamodule.setup("fit")
         extractor = ExtractorRes50()
         head = SimpleHead()
-
-        loss_func = losses.ContrastiveLoss(neg_margin=config["initial_trial1"]["neg_margin"], pos_margin=config["initial_trial1"]["pos_margin"])
-        model = CompleteModel(extractor, head, loss_func, datamodule.val_set, learning_rate=10**config["initial_trial1"]["learning_rate"],
-                              weight_decay=10**config["initial_trial1"]["weight_decay"])
+        # innit loss and wrapper network
+        loss_func = losses.ContrastiveLoss(neg_margin=config["initial_trial1"]["neg_margin"],
+                                           pos_margin=config["initial_trial1"]["pos_margin"])
+        model = CompleteModel(extractor, head, loss_func, datamodule.val_set,
+                              learning_rate=10 ** config["initial_trial1"]["learning_rate"],
+                              weight_decay=10 ** config["initial_trial1"]["weight_decay"])
+        # check for existing checkpoint
         checkpoint = config["checkpoint_path"] if os.path.exists(config["checkpoint_path"]) else None
+        # init callbacks and trainer
         checkpoint_callback = ModelCheckpoint(
             dirpath=config["checkpoint_folder"],
             filename=config["checkpoint_name"])
-        early_stop_callback = EarlyStopping(monitor="MAP@R", min_delta=0.005, patience=config["patience"], verbose=False,
+        early_stop_callback = EarlyStopping(monitor="MAP@R", min_delta=0.005, patience=config["patience"],
+                                            verbose=False,
                                             mode="max",
                                             divergence_threshold=0.05)
         trainer = pl.Trainer(
@@ -86,44 +92,44 @@ if __name__ == "__main__":
             precision=16,
             gpus=1 if torch.cuda.is_available() else None,
         )
+        # to safe hyperparams in the log files as well
         hyperparameters = dict(learning_rate=config["initial_trial1"]["learning_rate"],
                                weight_decay=config["initial_trial1"]["weight_decay"],
                                neg_margin=config["initial_trial1"]["neg_margin"],
                                pos_margin=config["initial_trial1"]["pos_margin"])
         trainer.logger.log_hyperparams(hyperparameters)
+        # fit model
         trainer.fit(model, datamodule=datamodule)
 
         result = dict(learning_rate=[config["initial_trial1"]["learning_rate"]],
-               weight_decay=[config["initial_trial1"]["weight_decay"]],
-               neg_margin=[config["initial_trial1"]["neg_margin"]],
-               pos_margin=[config["initial_trial1"]["pos_margin"]],
-                        result=[trainer.callback_metrics["MAP@R"].item()])
-
+                      weight_decay=[config["initial_trial1"]["weight_decay"]],
+                      neg_margin=[config["initial_trial1"]["neg_margin"]],
+                      pos_margin=[config["initial_trial1"]["pos_margin"]],
+                      result=[trainer.callback_metrics["MAP@R"].item()])
+        # save current model
         torch.save(model.model.state_dict(),
                    config["best_model_path"])
-        hyperframe  = pd.DataFrame(result)
+        # save hyperparams and corresponding result to csv
+        hyperframe = pd.DataFrame(result)
         hyperframe.to_csv(hyperframe_path)
+        # remove current checkpoint, since iteration finished correctly
+        # once this point within the code is reached
         condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
-
         if os.path.exists(config["checkpoint_path"]):
             os.remove(config["checkpoint_path"])
 
-
-
-
-
-
+    # second iteration with given hyperparams, almost the same as the first
     if len(hyperframe["result"]) == 1:
         datamodule = MiningDataModule(**config)
         datamodule.setup("fit")
         extractor = ExtractorRes50()
         head = SimpleHead()
 
-        loss_func = losses.ContrastiveLoss(neg_margin=config["initial_trial2"]["neg_margin"], pos_margin=config["initial_trial2"]["pos_margin"])
+        loss_func = losses.ContrastiveLoss(neg_margin=config["initial_trial2"]["neg_margin"],
+                                           pos_margin=config["initial_trial2"]["pos_margin"])
         model = CompleteModel(extractor, head, loss_func, datamodule.val_set,
                               learning_rate=10 ** config["initial_trial2"]["learning_rate"],
                               weight_decay=10 ** config["initial_trial2"]["weight_decay"])
-        # TODO fill in clause for case of resumed training
         condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
         checkpoint = config["checkpoint_path"] if os.path.exists(config["checkpoint_path"]) else None
         checkpoint_callback = ModelCheckpoint(
@@ -158,6 +164,7 @@ if __name__ == "__main__":
                       neg_margin=[config["initial_trial2"]["neg_margin"]],
                       pos_margin=[config["initial_trial2"]["pos_margin"]],
                       result=[trainer.callback_metrics["MAP@R"].item()])
+        # update best model if necessary
         if hyperframe["result"].to_list()[-1] <= result["result"][-1]:
             torch.save(model.model.state_dict(),
                        config["best_model_path"])
@@ -172,7 +179,8 @@ if __name__ == "__main__":
         if os.path.exists(config["checkpoint_path"]):
             os.remove(config["checkpoint_path"])
 
-
+    # beginning of actual bayesian optimization
+    # init optimizer
     bayes_opt = BayesianOptimization(
         f=None,
         pbounds=config["param_bounds"],
@@ -180,6 +188,7 @@ if __name__ == "__main__":
         random_state=1,
     )
     utility = UtilityFunction(kind="ucb", kappa=2.5, xi=0.0)
+    # feed all current hyperparam entries to the optimizer
     dict_list = hyperframe.to_dict('records')
     for entry in dict_list:
         params = {"learning_rate": entry["learning_rate"],
@@ -187,7 +196,9 @@ if __name__ == "__main__":
                   "neg_margin": entry["neg_margin"],
                   "pos_margin": entry["pos_margin"], }
         bayes_opt.register(params=params, target=entry["result"])
+    # once again condense checkpoints
     condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
+    # if there is no current checkpoint, get new hyperparams and save them in the config
     if not (os.path.exists(config["checkpoint_path"]) or config["checkpoint"]):
         new_hyperparams = bayes_opt.suggest(utility)
         config["intermediate_save"] = new_hyperparams
@@ -195,27 +206,23 @@ if __name__ == "__main__":
         with open(args.config_path + args.config, "w") as config_out:
             json.dump(config, config_out)
 
-
-
-
-
-
+    # loop for the rest of the script, initialzed with the remaining amount of predefined steps
     for x in range(config["num_iter"] - len(hyperframe)):
-
+        # identical to earlier part
         datamodule = MiningDataModule(**config)
         datamodule.setup("fit")
         extractor = ExtractorRes50()
         head = SimpleHead()
         condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
         checkpoint = config["checkpoint_path"] if os.path.exists(config["checkpoint_path"]) else None
-        loss_func = losses.ContrastiveLoss(neg_margin=config["intermediate_save"]["neg_margin"], pos_margin=config["intermediate_save"]["pos_margin"])
+        loss_func = losses.ContrastiveLoss(neg_margin=config["intermediate_save"]["neg_margin"],
+                                           pos_margin=config["intermediate_save"]["pos_margin"])
         model = CompleteModel(extractor, head, loss_func, datamodule.val_set,
                               learning_rate=10 ** config["intermediate_save"]["learning_rate"],
                               weight_decay=10 ** config["intermediate_save"]["weight_decay"])
-        # TODO fill in clause for case of resumed training
         checkpoint_callback = ModelCheckpoint(
-        dirpath=config["checkpoint_folder"],
-        filename=config["checkpoint_name"])
+            dirpath=config["checkpoint_folder"],
+            filename=config["checkpoint_name"])
         early_stop_callback = EarlyStopping(monitor="MAP@R", min_delta=0.005,
                                             patience=config["patience"], verbose=False,
                                             mode="max",
@@ -233,6 +240,8 @@ if __name__ == "__main__":
             precision=16,
             gpus=1 if torch.cuda.is_available() else None,
         )
+        # load hyperparams, that are either newly created before the loop or at
+        # the end of its iteration, or from immediate checkpoint if there is one
         if not new_hyperparams:
             new_hyperparams = config["intermediate_save"]
         hyperparameters = dict(learning_rate=new_hyperparams["learning_rate"],
@@ -241,7 +250,7 @@ if __name__ == "__main__":
                                pos_margin=new_hyperparams["pos_margin"])
         trainer.logger.log_hyperparams(hyperparameters)
         trainer.fit(model, datamodule=datamodule)
-
+        # log and save results
         result = dict(learning_rate=[new_hyperparams["learning_rate"]],
                       weight_decay=[new_hyperparams["weight_decay"]],
                       neg_margin=[new_hyperparams["neg_margin"]],
@@ -251,10 +260,10 @@ if __name__ == "__main__":
         frame_list = [hyperframe, resultdf]
         hyperframe = pd.concat(frame_list)
         hyperframe.to_csv(hyperframe_path)
+        # save model if the current one was the best, update config
         if (bayes_opt.max["target"] <= result["result"][-1]):
             torch.save(model.model.state_dict(),
                        config["best_model_path"])
-
         params = {"learning_rate": result["learning_rate"][0],
                   "weight_decay": result["weight_decay"][0],
                   "neg_margin": result["neg_margin"][0],
@@ -262,9 +271,11 @@ if __name__ == "__main__":
         config["checkpoint"] = False
         with open(args.config_path + args.config, "w") as config_out:
             json.dump(config, config_out)
+        # again, remove checkpoint if one exists
         condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
         if os.path.exists(config["checkpoint_path"]):
             os.remove(config["checkpoint_path"])
+        # new bayes step
         bayes_opt.register(params=params, target=entry["result"])
         new_hyperparams = bayes_opt.suggest(utility)
         config["intermediate_save"] = new_hyperparams
@@ -275,9 +286,3 @@ if __name__ == "__main__":
     config["finished_optimization"] = True
     with open(args.config_path + args.config, "w") as config_out:
         json.dump(config, config_out)
-
-
-
-
-
-
