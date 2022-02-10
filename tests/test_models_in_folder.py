@@ -37,8 +37,9 @@ def main():
                'mean_val_distance': [],
                'max_val_distance': []}
     pl.seed_everything(70)
-    for model_path in glob.glob("**/*.pth", recursive=True):
+    for model_path in glob.glob("./**/*.pth", recursive=True):
         name = model_path.split("/")[-1].split(".")[0]
+        print(model_path)
         print(name)
         metrics_dict["name"].append(name)
         datamodule = MiningDataModule(**config)
@@ -55,3 +56,6 @@ def main():
 
     result = pd.DataFrame(metrics_dict)
     result.to_csv("./test_results.csv")
+
+if __name__ == "__main__":
+    main()

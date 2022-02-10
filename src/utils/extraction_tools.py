@@ -2,16 +2,17 @@ import glob, os
 import argparse
 import pandas as pd
 
-def get_csv_summary(dir_path, result_folder, key_list):
+def get_csv_summary(dir_path, result_folder, key_list, experiment_name):
     result_keys = ["name"] + key_list
     result_df = pd.DataFrame(columns=result_keys)
     avg_df = pd.DataFrame(columns=result_keys)
 
-    for file in glob.glob(dir_path + "**/*.csv", recursive=True):
+    for file in glob.glob(dir_path + "/**/*.csv", recursive=True):
         print(file)
         iter_frame = pd.read_csv(file)
         name = file.split("/")[-1]
         name = name.split("hyper")[0]
+        print(list(iter_frame.columns))
         reduced_iter_frame = iter_frame[key_list].copy()
         # get top 3, get their mean and std, add them to avg_df
         top_results = reduced_iter_frame.sort_values('result').head(3)
@@ -33,7 +34,7 @@ def get_csv_summary(dir_path, result_folder, key_list):
     res_mean['name'] = "overall_mean"
     final_frame_list = [result_df, res_mean, res_std, avg_df]
     final_result_df = pd.concat(final_frame_list)
-    final_result_df.to_csv(result_folder)
+    final_result_df.to_csv(result_folder + experiment_name + ".csv")
 
 
 if __name__ == "__main__":
@@ -46,12 +47,12 @@ if __name__ == "__main__":
                                          "neg_margin", "pos_margin", "result"],
                         help='list of keys to extract')
 
-    parser.add_argument('--result_folder', default='~/results/',
+    parser.add_argument('--result_folder', default='./results/',
                         help='path where results should be saved to')
 
     args = parser.parse_args()
 
-    if not (os.path.exists(args['result_folder'])):
-        os.mkdir(args['result_folder'])
-    dir_pth = args["dir_path"] + args["experiment_name"]
-    get_csv_summary(dir_pth, args['result_folder'], args["key_list"])
+    if not os.path.exists(args.result_folder):
+        os.mkdir(args.result_folder)
+    dir_pth = args.dir_path + args.experiment_name
+    get_csv_summary(dir_pth, args.result_folder, args.key_list, args.experiment_name)
