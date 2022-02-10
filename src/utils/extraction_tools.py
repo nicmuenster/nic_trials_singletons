@@ -15,11 +15,23 @@ def get_csv_summary(dir_path, result_folder, key_list, experiment_name):
         print(list(iter_frame.columns))
         reduced_iter_frame = iter_frame[key_list].copy()
         # get top 3, get their mean and std, add them to avg_df
-        top_results = reduced_iter_frame.sort_values('result').head(3)
+        top_results = reduced_iter_frame.sort_values('result', ascending=False).head(3)
         top_std = top_results.std()
         top_mean = top_results.mean()
-        top_std['name'] = name + "mean"
-        top_mean['name'] = name + "avg"
+        filler_top_std = dict()
+        for key in top_std.keys():
+            filler_top_std[key] = [top_std[key]]
+        top_std = filler_top_std
+        #print([key for key in top_mean.keys()])
+        filler_top_mean = dict()
+        for key in top_mean.keys():
+            filler_top_mean[key] = [top_mean[key]]
+        top_mean = filler_top_mean
+
+        top_std['name'] = [name + "mean"]
+        top_mean['name'] = [name + "avg"]
+        top_std = pd.DataFrame(top_std)
+        top_mean = pd.DataFrame(top_mean)
         avg_list = [avg_df, top_mean, top_std]
         avg_df = pd.concat(avg_list)
         # get best params, add them to result_df
@@ -29,9 +41,23 @@ def get_csv_summary(dir_path, result_folder, key_list, experiment_name):
         result_df = pd.concat(frame_list)
     # get mean and std from result_df, add to the end
     res_std = result_df.std()
+    #
+    filler_res_std = dict()
+    for key in res_std.keys():
+        filler_res_std[key] = [res_std[key]]
+    res_std = filler_res_std
+    #
     res_mean = result_df.mean()
-    res_std['name'] = "overall_std"
-    res_mean['name'] = "overall_mean"
+    #
+    filler_res_mean = dict()
+    for key in res_mean.keys():
+        filler_res_mean[key] = [res_mean[key]]
+    res_mean = filler_res_mean
+    #
+    res_std['name'] = ["overall_std"]
+    res_mean['name'] = ["overall_mean"]
+    res_std = pd.DataFrame(res_std)
+    res_mean = pd.DataFrame(res_mean)
     final_frame_list = [result_df, res_mean, res_std, avg_df]
     final_result_df = pd.concat(final_frame_list)
     final_result_df.to_csv(result_folder + experiment_name + ".csv")
