@@ -54,5 +54,5 @@ if __name__ == "__main__":
 
     if not os.path.exists(args.result_folder):
         os.mkdir(args.result_folder)
-    dir_pth = args.dir_path + args.experiment_name
+    dir_pth = args.dir_path + args.experiment_name + "/trials"
     get_csv_summary(dir_pth, args.result_folder, args.key_list, args.experiment_name)
