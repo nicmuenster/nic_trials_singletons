@@ -34,6 +34,8 @@ if __name__ == "__main__":
     path0 = path0 + "/trials"
     if not (os.path.exists(path0)):
         os.mkdir(path0)
+    with open(path0 + "/test_config.json", "w") as config_out:
+        json.dump(config, config_out)
     for leave_in in range(6):
         current_num = leave_in * 20
         path1 = path0 + "/singles" + str(current_num)
