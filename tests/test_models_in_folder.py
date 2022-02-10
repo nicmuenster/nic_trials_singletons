@@ -30,9 +30,17 @@ def main():
     # parse config
     config = json.loads(config)
     # make training deterministic
+    metrics_dict = {"name": [],
+                "MAP@R": [],
+               "r_precision": [],
+               "precision_at_1": [],
+               'mean_val_distance': [],
+               'max_val_distance': []}
     pl.seed_everything(70)
     for model_path in glob.glob("**/*.pth", recursive=True):
-        print(model_path.split("/")[-1])
+        name = model_path.split("/")[-1].split(".")[0]
+        print(name)
+        metrics_dict["name"].append(name)
         datamodule = MiningDataModule(**config)
         datamodule.setup("fit")
         extractor = ExtractorRes50()
@@ -41,4 +49,9 @@ def main():
         model = CompleteModel(extractor, head, loss_func, datamodule.val_set)
         model.model.load_state_dict(torch.load(model_path))
         datamodule.setup("test")
-        model.test_various_metrics(datamodule.test_set)
+        current_metrics =model.test_various_metrics(datamodule.test_set)
+        for metric_key in current_metrics.keys():
+            metrics_dict[metric_key].append(current_metrics[metric_key])
+
+    result = pd.DataFrame(metrics_dict)
+    result.to_csv("./test_results.csv")

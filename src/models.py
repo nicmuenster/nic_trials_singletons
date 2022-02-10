@@ -117,4 +117,5 @@ class CompleteModel(pl.LightningModule):
                    'max_val_distance': max_distance
                    }
         self.log_dict(metrics)
+        return metrics
 
