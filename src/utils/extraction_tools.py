@@ -60,7 +60,7 @@ def get_csv_summary(dir_path, result_folder, key_list, experiment_name):
     res_mean = pd.DataFrame(res_mean)
     final_frame_list = [result_df, res_mean, res_std, avg_df]
     final_result_df = pd.concat(final_frame_list)
-    final_result_df = final_result_df[key_list].copy()
+    final_result_df = final_result_df[result_keys].copy()
     final_result_df.to_csv(result_folder + experiment_name + ".csv")
 
 
