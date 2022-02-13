@@ -133,7 +133,7 @@ class CompleteModel(pl.LightningModule):
                       }
         max_distance = 0
         mean_distance = 0
-        class_list, class_count = np.unique(labels, return_counts=True)
+        class_list, class_count = np.unique(labels.copy().cpu(), return_counts=True)
         for class_instance, class_number in zip(class_list, class_count):
             if class_number > 1:
                 sample_counter = sample_counter + class_number
