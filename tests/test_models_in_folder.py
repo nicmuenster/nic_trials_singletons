@@ -50,7 +50,7 @@ def main():
         model = CompleteModel(extractor, head, loss_func, datamodule.val_set)
         model.model.load_state_dict(torch.load(model_path))
         datamodule.setup("test")
-        current_metrics =model.test_various_metrics(datamodule.test_set)
+        current_metrics =model.test_metrics_memory_friendly(datamodule.test_set)
         for metric_key in current_metrics.keys():
             metrics_dict[metric_key].append(current_metrics[metric_key])
 
