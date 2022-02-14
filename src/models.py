@@ -133,11 +133,11 @@ class CompleteModel(pl.LightningModule):
                       }
         max_distance = 0
         mean_distance = 0
-        class_list, class_count = np.unique(labels.copy().cpu(), return_counts=True)
+        class_list, class_count = np.unique(labels.clone().cpu(), return_counts=True)
         for class_instance, class_number in zip(class_list, class_count):
             if class_number > 1:
                 sample_counter = sample_counter + class_number
-                current_indices = np.argwhere(labels == class_instance)
+                current_indices = np.argwhere(labels.clone().cpu() == class_instance)[0]
                 embedding_subset = embeddings[current_indices]
                 label_subset = labels[current_indices]
                 intermediate_accuracies = self.accuracy_calculator.get_accuracy(embedding_subset,
@@ -166,7 +166,7 @@ class CompleteModel(pl.LightningModule):
         print("max_interclass_distance = " + str(max_distance))
         print("Test set accuracy (MAP@R) = {}".format(accuracies["mean_average_precision_at_r"]))
         print("r_prec = " + str(accuracies["r_precision"]))
-        print("prec_at_1 = " + str(accuracies["precision_at_1"]))
+        print("prec_at_1 = "  + str(accuracies["precision_at_1"]))
         t1 = time.time()
         print("Time used for evaluating: " + str((t1 - t0) / 60) + " minutes")
         metrics = {"MAP@R": accuracies["mean_average_precision_at_r"],
@@ -175,6 +175,6 @@ class CompleteModel(pl.LightningModule):
                    'mean_val_distance': mean_distance,
                    'max_val_distance': max_distance
                    }
-        self.log_dict(metrics)
+        #self.log_dict(metrics)
         return metrics
 
