@@ -172,8 +172,8 @@ class CompleteModel(pl.LightningModule):
         metrics = {"MAP@R": accuracies["mean_average_precision_at_r"],
                    "r_precision": accuracies["r_precision"],
                    "precision_at_1": accuracies["precision_at_1"],
-                   'mean_val_distance': mean_distance,
-                   'max_val_distance': max_distance
+                   'mean_val_distance': mean_distance.cpu(),
+                   'max_val_distance': max_distance.cpu()
                    }
         #self.log_dict(metrics)
         return metrics
