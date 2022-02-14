@@ -36,7 +36,7 @@ def main():
                "precision_at_1": [],
                'mean_val_distance': [],
                'max_val_distance': []}
-    pl.seed_everything(70)
+    pl.seed_everything(42)
     for model_path in glob.glob("./**/*.pth", recursive=True):
         name = model_path.split("/")[-1].split(".")[0]
         print(model_path)
