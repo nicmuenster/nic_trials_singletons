@@ -28,7 +28,7 @@ if __name__ == "__main__":
     parser.add_argument('--config_path', default='./', help='the path where the config files are stored')
     parser.add_argument('--config', default='config.json',
                         help='the general experiment settings')
-    parser.add_argument('--model_params', default='model_params.json',
+    parser.add_argument('--model_params', default='model_params.csv',
                         help='the path to the hyper-parameter configurations for the models')
     parser.add_argument('--fold', default='1',
                         help='which fold shoud be used')
