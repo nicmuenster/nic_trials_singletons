@@ -56,7 +56,7 @@ if __name__ == "__main__":
                                        "precision_at_1_test":[],
                                        "mean_val_distance_test":[],
                                        "max_val_distance_test":[]})
-    if config["csv_test"].contains(".csv"):
+    if ".csv" in config["csv_test"]:
         config["csv_val"] = config["csv_val"].split("val")[0]
         config["csv_train"] = config["csv_train"].split("train")[0]
         config["csv_val_singles"] = config["csv_val"]
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
 
     for row in model_params.itertuples(index=True, name='Pandas'):
-        if row.name.contains("std"):
+        if "std" in row.name:
             continue
         # init data module and inner network
         datamodule = MiningDataModule(**config)
