@@ -46,7 +46,8 @@ if __name__ == "__main__":
     if os.path.exists(hyperframe_path):
         hyperframe = pd.read_csv(hyperframe_path)
     else:
-        hyperframe = pd.DataFrame({"learning_rate":[],
+        hyperframe = pd.DataFrame({     "name":[],
+                                        "learning_rate":[],
                                        "weight_decay":[],
                                        "neg_margin":[],
                                        "pos_margin":[],
@@ -110,7 +111,8 @@ if __name__ == "__main__":
         trainer.fit(model, datamodule=datamodule)
         torch.save(model.model.state_dict(),
                    row.name + ".pth")
-        result = dict(learning_rate=[row.learning_rate],
+        result = dict(      name=[row.name],
+                             learning_rate=[row.learning_rate],
                               weight_decay=[row.weight_decay],
                                neg_margin=[row.neg_margin],
                                pos_margin=[row.pos_margin],
