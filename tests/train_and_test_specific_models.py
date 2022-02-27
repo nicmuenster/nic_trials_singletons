@@ -41,7 +41,7 @@ if __name__ == "__main__":
     # parse config
     config = json.loads(config)
 
-    model_params = pd.DataFrame(args.config_path + args.model_params)
+    model_params = pd.read_csv(args.config_path + args.model_params)
     hyperframe_path = "./fold" + args.fold + "_results.csv"
     if os.path.exists(hyperframe_path):
         hyperframe = pd.read_csv(hyperframe_path)
