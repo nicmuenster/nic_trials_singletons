@@ -124,6 +124,7 @@ if __name__ == "__main__":
         current_metrics = model.test_metrics_memory_friendly(datamodule.test_set)
         for metric_key in current_metrics.keys():
             result[metric_key + "_test"] = [current_metrics[metric_key]]
+        result = pd.DataFrame(result)
         # save hyperparams and corresponding result to csv
         frame_list = [hyperframe, result]
         hyperframe = pd.concat(frame_list)
