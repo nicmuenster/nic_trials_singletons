@@ -68,9 +68,13 @@ if __name__ == "__main__":
 
 
     for row in model_params.itertuples(index=True, name='Pandas'):
-        if "std" in row.name:
+        if ("std" in row.name) or ("overall" in row.name):
             continue
         # init data module and inner network
+        split_values = row.name.replace(config["data_set"], "")
+        print(split_values)
+        config["singleton_percentage"] = int(split_values.split("_")[0])/100
+        config["singleton_percentage_end"] = int(split_values.split("_")[1])/100
         datamodule = MiningDataModule(**config)
         datamodule.setup("fit")
         extractor = ExtractorRes50()
