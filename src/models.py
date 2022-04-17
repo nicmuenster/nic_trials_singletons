@@ -89,7 +89,7 @@ class CompleteModel(pl.LightningModule):
         tester = testers.BaseTester(dataloader_num_workers=4)
         return tester.get_all_embeddings(dataset, model)
 
-    def test_various_metrics(self, testset):
+    def test_various_metrics_older_version(self, testset):
         t0 = time.time()
         device = torch.device("cuda")
         self.model = self.model.to(device)
@@ -120,7 +120,102 @@ class CompleteModel(pl.LightningModule):
         return metrics
 
 
+    def test_various_metrics(self, testset):
+        t0 = time.time()
+        device = torch.device("cuda")
+        self.model = self.model.to(device)
+        embeddings, labels = self.get_all_embeddings(testset, self.model)
+        labels = labels.squeeze(1)
+        print("Computing accuracy")
+        accuracies = self.accuracy_calculator.get_accuracy(embeddings,
+                                                           embeddings,
+                                                           labels,
+                                                           labels,
+                                                           True)
+        dist_mat = self.distance.compute_mat(torch.tensor(embeddings, dtype=torch.float), None)
+        mean_distance = torch.mean(dist_mat)
+        max_distance = torch.max(dist_mat)
+        print("mean_distance = " + str(mean_distance))
+        print("max_distance = " + str(max_distance))
+        print("Test set accuracy (MAP@R) = {}".format(accuracies["mean_average_precision_at_r"]))
+        print("r_prec = " + str(accuracies["r_precision"]))
+        print("prec_at_1 = " + str(accuracies["precision_at_1"]))
+        t1 = time.time()
+        print("Time used for evaluating: " + str((t1 - t0) / 60) + " minutes")
+        metrics = {"MAP@R": accuracies["mean_average_precision_at_r"],
+                   "r_precision": accuracies["r_precision"],
+                   "precision_at_1": accuracies["precision_at_1"],
+                   'mean_val_distance': mean_distance,
+                   'max_val_distance': max_distance
+                   }
+        self.log_dict(metrics)
+        return metrics
+
+
     def test_metrics_memory_friendly(self, testset):
+        t0 = time.time()
+        device = torch.device("cuda")
+        self.model = self.model.to(device)
+        embeddings, labels = self.get_all_embeddings(testset, self.model)
+        print("Computing accuracy")
+        sample_counter = 0
+        accuracies = {"mean_average_precision_at_r": 0,
+                      "precision_at_1": 0,
+                      "r_precision": 0,
+                      }
+        max_distance = 0
+        mean_distance = 0
+        class_list, class_count = np.unique(labels.clone().cpu(), return_counts=True)
+        for class_instance, class_number in zip(class_list, class_count):
+            if class_number > 1:
+                sample_counter = sample_counter + class_number
+                current_indices = np.argwhere(labels.clone().cpu() == class_instance)[0]
+                embedding_subset = embeddings[current_indices]
+                label_subset = labels[current_indices]
+
+                label_subset = label_subset.squeeze(1)
+                labels = labels.squeeze(1)
+
+                intermediate_accuracies = self.accuracy_calculator.get_accuracy(embedding_subset,
+                                                                                embeddings,
+                                                                                label_subset,
+                                                                                labels,
+                                                                                True)
+                accuracies["mean_average_precision_at_r"] = accuracies["mean_average_precision_at_r"] + \
+                                                            intermediate_accuracies["mean_average_precision_at_r"] \
+                                                            * class_number
+                accuracies["r_precision"] = accuracies["r_precision"] + \
+                                            intermediate_accuracies["r_precision"] * class_number
+                accuracies["precision_at_1"] = accuracies["precision_at_1"] + \
+                                               intermediate_accuracies["precision_at_1"] * class_number
+                int_dist_mat = self.distance.compute_mat(torch.tensor(embedding_subset, dtype=torch.float), None)
+                int_mean_distance = torch.mean(int_dist_mat) * class_number
+                mean_distance = mean_distance + int_mean_distance
+                int_max_distance = torch.max(int_dist_mat)
+                if int_max_distance > max_distance:
+                    max_distance = int_max_distance
+        mean_distance = mean_distance / sample_counter
+        accuracies["mean_average_precision_at_r"] = accuracies["mean_average_precision_at_r"] / sample_counter
+        accuracies["r_precision"] = accuracies["r_precision"] / sample_counter
+        accuracies["precision_at_1"] = accuracies["precision_at_1"] / sample_counter
+        print("mean_interclass_distance = " + str(mean_distance))
+        print("max_interclass_distance = " + str(max_distance))
+        print("Test set accuracy (MAP@R) = {}".format(accuracies["mean_average_precision_at_r"]))
+        print("r_prec = " + str(accuracies["r_precision"]))
+        print("prec_at_1 = "  + str(accuracies["precision_at_1"]))
+        t1 = time.time()
+        print("Time used for evaluating: " + str((t1 - t0) / 60) + " minutes")
+        metrics = {"MAP@R": accuracies["mean_average_precision_at_r"],
+                   "r_precision": accuracies["r_precision"],
+                   "precision_at_1": accuracies["precision_at_1"],
+                   'mean_val_distance': mean_distance.cpu().item(),
+                   'max_val_distance': max_distance.cpu().item()
+                   }
+        #self.log_dict(metrics)
+        return metrics
+
+
+    def test_metrics_memory_friendly_old_version(self, testset):
         t0 = time.time()
         device = torch.device("cuda")
         self.model = self.model.to(device)
