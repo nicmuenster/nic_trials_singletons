@@ -125,10 +125,10 @@ class CompleteModel(pl.LightningModule):
         device = torch.device("cuda")
         self.model = self.model.to(device)
         embeddings, labels = self.get_all_embeddings(testset, self.model)
-        print(embeddings.size)
-        print(labels.size)
+        print(embeddings.size())
+        print(labels.size())
         labels = labels.squeeze(1)
-        print(labels.size)
+        print(labels.size())
         print("Computing accuracy")
         accuracies = self.accuracy_calculator.get_accuracy(embeddings,
                                                            embeddings,
