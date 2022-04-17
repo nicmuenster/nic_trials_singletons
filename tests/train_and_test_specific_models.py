@@ -53,7 +53,7 @@ if __name__ == "__main__":
                                        "pos_margin":[],
                                        "result":[],
                                        "MAP@R_test":[],
-                                       "r_precision":[],
+                                       "r_precision_test":[],
                                        "precision_at_1_test":[],
                                        "mean_val_distance_test":[],
                                        "max_val_distance_test":[]})
