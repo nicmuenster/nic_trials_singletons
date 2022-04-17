@@ -7,7 +7,6 @@ from pytorch_metric_learning import miners, losses, reducers, distances, regular
 import torch.nn as nn
 import torch
 import time
-torch.use_deterministic_algorithms(False)
 
 
 class CompleteModel(pl.LightningModule):
