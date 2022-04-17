@@ -17,6 +17,12 @@ import argparse
 
 
 def main():
+    seed = 42
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
     parser = argparse.ArgumentParser('Singleton Retrieval Testing Setup')
     parser.add_argument('--config_path', default='./', help='the path where the config files are stored')
     parser.add_argument('--config', default='config.json',
@@ -36,7 +42,7 @@ def main():
                "precision_at_1": [],
                'mean_val_distance': [],
                'max_val_distance': []}
-    pl.seed_everything(42)
+    #pl.seed_everything(42)
     for model_path in glob.glob("./**/*.pth", recursive=True):
         name = model_path.split("/")[-1].split(".")[0]
         print(model_path)
