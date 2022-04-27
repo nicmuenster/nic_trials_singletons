@@ -176,7 +176,7 @@ class CompleteModel(pl.LightningModule):
                 embedding_subset = embeddings[current_indices]
                 label_subset = labels[current_indices]
 
-                label_subset = label_subset.squeeze(1)
+                #label_subset = label_subset.squeeze(1)
                 labels = labels.squeeze(1)
 
                 intermediate_accuracies = self.accuracy_calculator.get_accuracy(embedding_subset,
