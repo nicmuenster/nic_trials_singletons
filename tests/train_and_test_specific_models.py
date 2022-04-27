@@ -108,9 +108,8 @@ if __name__ == "__main__":
                                pos_margin=row.pos_margin)
         trainer.logger.log_hyperparams(hyperparameters)
         # fit model
+        #if not os.path.exists(args.config_path + row.name + ".pth"):
         trainer.fit(model, datamodule=datamodule)
-        torch.save(model.model.state_dict(),
-                   row.name + ".pth")
         result = dict(      name=[row.name],
                              learning_rate=[row.learning_rate],
                               weight_decay=[row.weight_decay],
@@ -127,5 +126,5 @@ if __name__ == "__main__":
         result = pd.DataFrame(result)
         # save hyperparams and corresponding result to csv
         frame_list = [hyperframe, result]
-        hyperframe = pd.concat(frame_list)
+        hyperframe = pd.concat(frame_list, ignore_index=True)
         hyperframe.to_csv(hyperframe_path)

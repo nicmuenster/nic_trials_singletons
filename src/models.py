@@ -13,7 +13,7 @@ class CompleteModel(pl.LightningModule):
     def __init__(self, extractor, head, loss_func, test_set_val, learning_rate=1e-5, weight_decay=1e-6):
         super().__init__()
         self.save_hyperparameters( 'learning_rate',
-                                   'weight_decay')
+                                   'weight_decay', ignore=['extractor', 'head', 'loss_func'])
         self.accuracy_calculator = AccuracyCalculator(
             include=("mean_average_precision_at_r", "precision_at_1", "r_precision"), avg_of_avgs=False)
         self.loss_func = loss_func
@@ -175,9 +175,9 @@ class CompleteModel(pl.LightningModule):
                 current_indices = np.argwhere(labels.clone().cpu() == class_instance)[0]
                 embedding_subset = embeddings[current_indices]
                 label_subset = labels[current_indices]
-
+                print(label_subset.shape())
                 #label_subset = label_subset.squeeze(1)
-                labels = labels.squeeze(1)
+                #labels = labels.squeeze(1)
 
                 intermediate_accuracies = self.accuracy_calculator.get_accuracy(embedding_subset,
                                                                                 embeddings,
