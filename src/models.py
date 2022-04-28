@@ -175,7 +175,7 @@ class CompleteModel(pl.LightningModule):
                 current_indices = np.argwhere(labels.clone().cpu() == class_instance)[0]
                 embedding_subset = embeddings[current_indices]
                 label_subset = labels[current_indices]
-                print(label_subset.shape())
+                print(label_subset.size())
                 #label_subset = label_subset.squeeze(1)
                 #labels = labels.squeeze(1)
 
