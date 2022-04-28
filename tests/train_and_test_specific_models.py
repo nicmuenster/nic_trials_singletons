@@ -109,8 +109,9 @@ if __name__ == "__main__":
         trainer.logger.log_hyperparams(hyperparameters)
         # fit model
         # TODO throw out after debugging
-        current_metrics = model.test_metrics_memory_friendly(datamodule.test_set)
         datamodule.setup("test")
+        current_metrics = model.test_metrics_memory_friendly(datamodule.test_set)
+
         #if not os.path.exists(args.config_path + row.name + ".pth"):
         trainer.fit(model, datamodule=datamodule)
         result = dict(      name=[row.name],
