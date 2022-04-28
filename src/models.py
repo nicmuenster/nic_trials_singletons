@@ -175,9 +175,14 @@ class CompleteModel(pl.LightningModule):
                 current_indices = np.argwhere(labels.clone().cpu() == class_instance)[0]
                 embedding_subset = embeddings[current_indices]
                 label_subset = labels[current_indices]
+                print(embedding_subset.size())
+                print(embeddings.size())
                 print(label_subset.size())
-                #label_subset = label_subset.squeeze(1)
-                #labels = labels.squeeze(1)
+                print(labels.size())
+                label_subset = label_subset.squeeze(-1)
+                labels = labels.squeeze(-1)
+                print(label_subset.size())
+                print(labels.size())
 
                 intermediate_accuracies = self.accuracy_calculator.get_accuracy(embedding_subset,
                                                                                 embeddings,
