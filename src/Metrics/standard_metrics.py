@@ -41,7 +41,7 @@ def calculate_data_set_rec_prec(embeddings, labels, k_list, precision=True, reca
                 if recall:
                     recall_list[k] += recall_at_k_single_q(sorted_true_label_array[:-1], k_list[k])
         if curr_index % 1000==0:
-            print("Processed " + curr_index + " samples")
+            print("Processed " + str(curr_index) + " samples")
     return prec_list / num_samples, recall_list / num_samples
 
 
