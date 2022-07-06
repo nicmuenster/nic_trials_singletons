@@ -47,18 +47,14 @@ def calculate_data_set_rec_prec(embeddings, labels, k_list, precision=True, reca
 
 if __name__ == "__main__":
     # for testing
-    #rand_emb = np.random.rand(20, 128)
-    #rand_labels = np.random.random_integers(0, 6, (20))
-    #print(rand_labels.shape)
-    #print(rand_emb.shape)
+    rand_emb = np.random.rand(20, 128)
+    rand_labels = np.random.random_integers(0, 6, (20))
+    print(rand_labels.shape)
+    print(rand_emb.shape)
 
     # k list
     k_list = [1, 2, 5, 10, 20, 25, 30, 40, 50]
     # or
     #k_list = np.arrange(1,51)
 
-
-    embeddings = np.load("C:/Users/nicmu/Desktop/sebastian_thesis_tests/seb_thesis_512_embeddings_test.npy")
-    labels = np.load("C:/Users/nicmu/Desktop/sebastian_thesis_tests/seb_thesis_512_labels_test.npy")
-
-    print(calculate_data_set_rec_prec(embeddings, labels, k_list, precision=True, recall=True))
+    print(calculate_data_set_rec_prec(rand_emb, rand_labels, k_list, precision=True, recall=True))

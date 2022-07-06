@@ -10,10 +10,11 @@ import time
 
 
 class CompleteModel(pl.LightningModule):
-    def __init__(self, extractor, head, loss_func, test_set_val, learning_rate=1e-5, weight_decay=1e-6):
+    def __init__(self, extractor, head, loss_func, test_set_val, learning_rate=1e-5, weight_decay=1e-6,
+                 lr_scheduler=False):
         super().__init__()
         self.save_hyperparameters( 'learning_rate',
-                                   'weight_decay', ignore=['extractor', 'head', 'loss_func'])
+                                   'weight_decay', 'lr_scheduler', ignore=['extractor', 'head', 'loss_func'])
         self.accuracy_calculator = AccuracyCalculator(
             include=("mean_average_precision_at_r", "precision_at_1", "r_precision"), avg_of_avgs=False)
         self.loss_func = loss_func
@@ -51,6 +52,42 @@ class CompleteModel(pl.LightningModule):
                                         lr=self.hparams.learning_rate,
                                         weight_decay=self.hparams.weight_decay)
 
+        if self.hparams.lr_scheduler:
+            # standard pytorch params except "min" to "max" and patience from 10 to 5
+            scheduler = torch.optim.lr_scheduler.torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max',
+                                                                                            factor=0.1,
+                                                                                            patience=5,
+                                                                                            threshold=0.0001,
+                                                                                            threshold_mode='rel',
+                                                                                            cooldown=0, min_lr=0,
+                                                                                            eps=1e-08,
+                                                                                            verbose=False)
+            # scheduler config used by lightning, for clarity descriptions were ported as well
+            lr_scheduler_config = {
+                # REQUIRED: The scheduler instance
+                "scheduler": scheduler,
+                # The unit of the scheduler's step size, could also be 'step'.
+                # 'epoch' updates the scheduler on epoch end whereas 'step'
+                # updates it after a optimizer update.
+                "interval": "epoch",
+                # How many epochs/steps should pass between calls to
+                # `scheduler.step()`. 1 corresponds to updating the learning
+                # rate after every epoch/step.
+                "frequency": 1,
+                # Metric to to monitor for schedulers like `ReduceLROnPlateau`
+                "monitor": "MAP@R",
+                # If set to `True`, will enforce that the value specified 'monitor'
+                # is available when the scheduler is updated, thus stopping
+                # training if not found. If set to `False`, it will only produce a warning
+                "strict": True,
+                # If using the `LearningRateMonitor` callback to monitor the
+                # learning rate progress, this keyword can be used to specify
+                # a custom logged name
+                "name": None,
+            }
+
+            return [optimizer], [lr_scheduler_config]
+
 
         return [optimizer]
 
@@ -79,11 +116,6 @@ class CompleteModel(pl.LightningModule):
         embeddings = self(inputs)
         loss = self.loss_func(embeddings, labels)
         self.log('test_loss', loss)
-
-    # most likely useless as model has to be created again (at least when using lr finder)
-    def unfreeze_extractor(self):
-        self.hparams.extractor.unfreeze()
-        self.hparams.frozen_at_start = False
 
     def get_all_embeddings(self, dataset, model):
         tester = testers.BaseTester(dataloader_num_workers=4)
