@@ -35,7 +35,9 @@ if __name__ == "__main__":
 
     # parse config
     config = json.loads(config)
-
+    # to make code backward compatible to earlier versions without lr_scheduler
+    if "lr_scheduler" not in config.keys():
+        config["lr_scheduler"] = False
     # for the moment, the amount of optimization steps is initialized here. Not pretty but works fine
     # for the moment and easier than current alternatives. Candidate to be changed later on.
     max_num_trials = 50
@@ -68,7 +70,8 @@ if __name__ == "__main__":
                                            pos_margin=config["initial_trial1"]["pos_margin"])
         model = CompleteModel(extractor, head, loss_func, datamodule.val_set,
                               learning_rate=10 ** config["initial_trial1"]["learning_rate"],
-                              weight_decay=10 ** config["initial_trial1"]["weight_decay"])
+                              weight_decay=10 ** config["initial_trial1"]["weight_decay"],
+                              lr_scheduler=config["lr_scheduler"])
         # check for existing checkpoint
         checkpoint = config["checkpoint_path"] if os.path.exists(config["checkpoint_path"]) else None
         # init callbacks and trainer
@@ -129,7 +132,8 @@ if __name__ == "__main__":
                                            pos_margin=config["initial_trial2"]["pos_margin"])
         model = CompleteModel(extractor, head, loss_func, datamodule.val_set,
                               learning_rate=10 ** config["initial_trial2"]["learning_rate"],
-                              weight_decay=10 ** config["initial_trial2"]["weight_decay"])
+                              weight_decay=10 ** config["initial_trial2"]["weight_decay"],
+                              lr_scheduler=config["lr_scheduler"])
         condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
         checkpoint = config["checkpoint_path"] if os.path.exists(config["checkpoint_path"]) else None
         checkpoint_callback = ModelCheckpoint(
@@ -219,7 +223,8 @@ if __name__ == "__main__":
                                            pos_margin=config["intermediate_save"]["pos_margin"])
         model = CompleteModel(extractor, head, loss_func, datamodule.val_set,
                               learning_rate=10 ** config["intermediate_save"]["learning_rate"],
-                              weight_decay=10 ** config["intermediate_save"]["weight_decay"])
+                              weight_decay=10 ** config["intermediate_save"]["weight_decay"],
+                              lr_scheduler=config["lr_scheduler"])
         checkpoint_callback = ModelCheckpoint(
             dirpath=config["checkpoint_folder"],
             filename=config["checkpoint_name"])

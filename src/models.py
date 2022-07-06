@@ -13,7 +13,7 @@ class CompleteModel(pl.LightningModule):
     def __init__(self, extractor, head, loss_func, test_set_val, learning_rate=1e-5, weight_decay=1e-6,
                  lr_scheduler=False):
         super().__init__()
-        self.save_hyperparameters( 'learning_rate',
+        self.save_hyperparameters('learning_rate',
                                    'weight_decay', 'lr_scheduler', ignore=['extractor', 'head', 'loss_func'])
         self.accuracy_calculator = AccuracyCalculator(
             include=("mean_average_precision_at_r", "precision_at_1", "r_precision"), avg_of_avgs=False)

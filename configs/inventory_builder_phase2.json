@@ -30,6 +30,7 @@
 	"singleton_percentage":0.0,
 	"singleton_percentage_end":0.0,
 	"keep_singletons":true,
+	"lr_scheduler": true,
 	"initial_trial1": {
 		"neg_margin": 1,
 		"pos_margin": 0,
