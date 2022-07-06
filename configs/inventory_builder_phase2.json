@@ -34,13 +34,13 @@
 		"neg_margin": 1,
 		"pos_margin": 0,
 		"weight_decay" : -5,
-		"learning_rate" :-4
+		"learning_rate" :-5
 	},
 	"initial_trial2": {
 		"neg_margin": 1,
 		"pos_margin": 0,
 		"weight_decay" : -4,
-		"learning_rate" :-2
+		"learning_rate" :-4
 	},
 	"intermediate_save": {
 		"neg_margin": null,
