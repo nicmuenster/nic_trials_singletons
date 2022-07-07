@@ -54,14 +54,15 @@ class CompleteModel(pl.LightningModule):
 
         if self.hparams.lr_scheduler:
             # standard pytorch params except "min" to "max" and patience from 10 to 5
-            scheduler = torch.optim.lr_scheduler.torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max',
-                                                                                            factor=0.1,
-                                                                                            patience=5,
-                                                                                            threshold=0.0001,
-                                                                                            threshold_mode='rel',
-                                                                                            cooldown=0, min_lr=0,
-                                                                                            eps=1e-08,
-                                                                                            verbose=False)
+            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
+                                                                   mode='max',
+                                                                   factor=0.1,
+                                                                   patience=5,
+                                                                   threshold=0.0001,
+                                                                   threshold_mode='rel',
+                                                                   cooldown=0, min_lr=0,
+                                                                   eps=1e-08,
+                                                                   verbose=False)
             # scheduler config used by lightning, for clarity descriptions were ported as well
             lr_scheduler_config = {
                 # REQUIRED: The scheduler instance
