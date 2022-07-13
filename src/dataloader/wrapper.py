@@ -20,8 +20,8 @@ class miningDataset(data.Dataset):
         self.num_samples = len(self.mining_list)
         if self.train:
                 transform_list = [
-                            tv.transforms.ColorJitter(brightness=0.4,saturation=0.4,contrast=0.4,hue=0.1),
-                            tv.transforms.Resize([input_size, input_size], interpolation=2),
+                            tv.transforms.ColorJitter(brightness=0.4, saturation=0.4, contrast=0.4, hue=0.1),
+                            tv.transforms.Resize([input_size, input_size], tv.transforms.InterpolationMode.BILINEAR),
           #          '''tv.transforms.RandomApply([tv.transforms.RandomAffine(degrees=20,
           #                                          translate=(0.2, 0.2),
           #                                          scale=(0.8, 1.2),
@@ -64,13 +64,13 @@ class miningDataset_debug(data.Dataset):
         self.num_samples = len(self.mining_list)
         if self.train:
                 transform_list = [
-                            tv.transforms.Resize([input_size, input_size], interpolation=2),
+                            tv.transforms.Resize([input_size, input_size], tv.transforms.InterpolationMode.BILINEAR),
                             tv.transforms.ToTensor(),
                             tv.transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])]
 
         else:
                 transform_list = [
-                            tv.transforms.Resize([input_size, input_size], interpolation=2),
+                            tv.transforms.Resize([input_size, input_size],tv.transforms.InterpolationMode.BILINEAR),
                             tv.transforms.ToTensor(),
                             tv.transforms.Normalize(mean = [0.485, 0.456, 0.406],std = [0.229, 0.224, 0.225])]
 
@@ -103,7 +103,7 @@ class basicDataset(data.Dataset):
         if self.train:
                 transform_list = [
                             tv.transforms.ColorJitter(brightness=0.4,saturation=0.4,contrast=0.4,hue=0.1),
-                            tv.transforms.Resize([input_size, input_size], interpolation=2),
+                            tv.transforms.Resize([input_size, input_size], tv.transforms.InterpolationMode.BILINEAR),
           #          '''tv.transforms.RandomApply([tv.transforms.RandomAffine(degrees=20,
           #                                          translate=(0.2, 0.2),
           #                                          scale=(0.8, 1.2),
@@ -117,7 +117,7 @@ class basicDataset(data.Dataset):
 
         else:
                 transform_list = [
-                            tv.transforms.Resize([input_size, input_size], interpolation=2),
+                            tv.transforms.Resize([input_size, input_size], tv.transforms.InterpolationMode.BILINEAR),
                             tv.transforms.ToTensor(),
                             tv.transforms.Normalize(mean = [0.485, 0.456, 0.406],std = [0.229, 0.224, 0.225])]
 

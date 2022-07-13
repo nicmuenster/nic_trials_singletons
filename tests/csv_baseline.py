@@ -85,11 +85,11 @@ if __name__ == "__main__":
         trainer = pl.Trainer(
             logger=True,
             default_root_dir=config["log_path"],
-            resume_from_checkpoint=checkpoint,
             max_epochs=50,
             min_epochs=15,
             callbacks=[checkpoint_callback, early_stop_callback],
-            progress_bar_refresh_rate=500,
+            #progress_bar_refresh_rate=500,
+            enable_progress_bar=False,
             val_check_interval=1.0,
             deterministic=True,
             precision=16,
@@ -102,7 +102,7 @@ if __name__ == "__main__":
                                pos_margin=config["initial_trial1"]["pos_margin"])
         trainer.logger.log_hyperparams(hyperparameters)
         # fit model
-        trainer.fit(model, datamodule=datamodule)
+        trainer.fit(model, datamodule=datamodule, ckpt_path=checkpoint)
 
         result = dict(learning_rate=[config["initial_trial1"]["learning_rate"]],
                       weight_decay=[config["initial_trial1"]["weight_decay"]],
@@ -146,11 +146,11 @@ if __name__ == "__main__":
         trainer = pl.Trainer(
             logger=True,
             default_root_dir=config["log_path"],
-            resume_from_checkpoint=checkpoint,
             max_epochs=50,
             min_epochs=20,
             callbacks=[checkpoint_callback, early_stop_callback],
-            progress_bar_refresh_rate=500,
+            #progress_bar_refresh_rate=500,
+            enable_progress_bar=False,
             val_check_interval=1.0,
             deterministic=True,
             precision=16,
@@ -161,7 +161,7 @@ if __name__ == "__main__":
                                neg_margin=config["initial_trial2"]["neg_margin"],
                                pos_margin=config["initial_trial2"]["pos_margin"])
         trainer.logger.log_hyperparams(hyperparameters)
-        trainer.fit(model, datamodule=datamodule)
+        trainer.fit(model, datamodule=datamodule, ckpt_path=checkpoint)
 
         result = dict(learning_rate=[config["initial_trial2"]["learning_rate"]],
                       weight_decay=[config["initial_trial2"]["weight_decay"]],
@@ -235,11 +235,11 @@ if __name__ == "__main__":
         trainer = pl.Trainer(
             logger=True,
             default_root_dir=config["log_path"],
-            resume_from_checkpoint=checkpoint,
             max_epochs=50,
             min_epochs=20,
             callbacks=[checkpoint_callback, early_stop_callback],
-            progress_bar_refresh_rate=500,
+            #progress_bar_refresh_rate=500,
+            enable_progress_bar=False,
             val_check_interval=1.0,
             deterministic=True,
             precision=16,
@@ -254,7 +254,7 @@ if __name__ == "__main__":
                                neg_margin=new_hyperparams["neg_margin"],
                                pos_margin=new_hyperparams["pos_margin"])
         trainer.logger.log_hyperparams(hyperparameters)
-        trainer.fit(model, datamodule=datamodule)
+        trainer.fit(model, datamodule=datamodule, ckpt_path=checkpoint)
         # log and save results
         result = dict(learning_rate=[new_hyperparams["learning_rate"]],
                       weight_decay=[new_hyperparams["weight_decay"]],
