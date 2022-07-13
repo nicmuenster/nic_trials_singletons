@@ -110,7 +110,8 @@ class CompleteModel(pl.LightningModule):
         return None
 
     def validation_epoch_end(self, outs):
-        self.test_various_metrics(self.test_set_val)
+        metrics = self.test_various_metrics(self.test_set_val)
+        return metrics
 
     def test_step(self, batch, batch_idx):
         inputs, labels = batch
