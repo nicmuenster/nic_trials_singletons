@@ -176,7 +176,7 @@ if __name__ == "__main__":
 
         frame_list = [hyperframe, result]
 
-        hyperframe = pd.concat(frame_list)
+        hyperframe = pd.concat(frame_list, ignore_index=True)
         hyperframe.to_csv(hyperframe_path)
         condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
 
@@ -263,7 +263,7 @@ if __name__ == "__main__":
                       result=[trainer.callback_metrics["MAP@R"].item()])
         resultdf = pd.DataFrame(result)
         frame_list = [hyperframe, resultdf]
-        hyperframe = pd.concat(frame_list)
+        hyperframe = pd.concat(frame_list, ignore_index=True)
         hyperframe.to_csv(hyperframe_path)
         # save model if the current one was the best, update config
         if (bayes_opt.max["target"] <= result["result"][-1]):
