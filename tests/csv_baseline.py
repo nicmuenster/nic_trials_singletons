@@ -48,13 +48,19 @@ if __name__ == "__main__":
     hyperframe_path = config["hyper_csv"]
     # file exists
     if os.path.exists(config["hyper_csv"]):
-        hyperframe = pd.read_csv(hyperframe_path)
+        hyperframe = pd.read_csv(hyperframe_path, names=['learning_rate',
+                                                         'weight_decay',
+                                                         'neg_margin',
+                                                         'pos_margin',
+                                                         'req_epochs',
+                                                         'result'])
     # else create csv file for bayesian optimization
     else:
         hyperframe = pd.DataFrame(dict(learning_rate=[],
                                        weight_decay=[],
                                        neg_margin=[],
                                        pos_margin=[],
+                                       req_epochs=[],
                                        result=[]))
     # rename last checkpoint if necessary
     condense_checkpoints(config["checkpoint_folder"], config["checkpoint_name"])
@@ -108,6 +114,7 @@ if __name__ == "__main__":
                       weight_decay=[config["initial_trial1"]["weight_decay"]],
                       neg_margin=[config["initial_trial1"]["neg_margin"]],
                       pos_margin=[config["initial_trial1"]["pos_margin"]],
+                      req_epochs=[model.epoch_counter],
                       result=[trainer.callback_metrics["MAP@R"].item()])
         # save current model
         torch.save(model.model.state_dict(),
@@ -167,6 +174,7 @@ if __name__ == "__main__":
                       weight_decay=[config["initial_trial2"]["weight_decay"]],
                       neg_margin=[config["initial_trial2"]["neg_margin"]],
                       pos_margin=[config["initial_trial2"]["pos_margin"]],
+                      req_epochs=[model.epoch_counter],
                       result=[trainer.callback_metrics["MAP@R"].item()])
         # update best model if necessary
         if hyperframe["result"].to_list()[-1] <= result["result"][-1]:
@@ -260,6 +268,7 @@ if __name__ == "__main__":
                       weight_decay=[new_hyperparams["weight_decay"]],
                       neg_margin=[new_hyperparams["neg_margin"]],
                       pos_margin=[new_hyperparams["pos_margin"]],
+                      req_epochs=[model.epoch_counter],
                       result=[trainer.callback_metrics["MAP@R"].item()])
         resultdf = pd.DataFrame(result)
         frame_list = [hyperframe, resultdf]

@@ -23,6 +23,7 @@ class CompleteModel(pl.LightningModule):
 
         self.model = nn.Sequential(extractor, head)
         self.distance = distances.LpDistance(normalize_embeddings=False)
+        self.epoch_counter = 0
 
     def forward(self, x):
         x = self.model(x)
@@ -110,7 +111,10 @@ class CompleteModel(pl.LightningModule):
         return None
 
     def validation_epoch_end(self, outs):
+        self.epoch_counter = self.epoch_counter + 1
+        print("epoch number " + str(self.epoch_counter))
         metrics = self.test_various_metrics(self.test_set_val)
+
         return metrics
 
     def test_step(self, batch, batch_idx):
