@@ -76,10 +76,6 @@ if __name__ == "__main__":
 
                 intermediate_config["singleton_percentage"] = current_num / 100.0
                 intermediate_config["singleton_percentage_end"] = current_inner_num / 100.0
-                print(intermediate_config["singleton_percentage"])
-                print(intermediate_config["singleton_percentage"])
-                print(current_num / 100.0)
-                print(current_inner_num / 100.0)
 
                 with open(path3 + "/config.json", "w") as config_out:
                     json.dump(intermediate_config, config_out)
