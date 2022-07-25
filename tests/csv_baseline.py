@@ -48,12 +48,7 @@ if __name__ == "__main__":
     hyperframe_path = config["hyper_csv"]
     # file exists
     if os.path.exists(config["hyper_csv"]):
-        hyperframe = pd.read_csv(hyperframe_path, names=['learning_rate',
-                                                         'weight_decay',
-                                                         'neg_margin',
-                                                         'pos_margin',
-                                                         'req_epochs',
-                                                         'result'])
+        hyperframe = pd.read_csv(hyperframe_path)
     # else create csv file for bayesian optimization
     else:
         hyperframe = pd.DataFrame(dict(learning_rate=[],
