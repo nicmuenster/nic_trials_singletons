@@ -74,8 +74,8 @@ if __name__ == "__main__":
 
                 intermediate_config["log_path"] = path3 + config["log_path"]
 
-                intermediate_config["singleton_percentage"] = current_num / 100
-                intermediate_config["singleton_percentage_end"] = current_inner_num / 100
+                intermediate_config["singleton_percentage"] = current_num / 100.0
+                intermediate_config["singleton_percentage_end"] = current_inner_num / 100.0
                 print(intermediate_config["singleton_percentage"])
                 print(intermediate_config["singleton_percentage"])
                 print(current_num / 100.0)
