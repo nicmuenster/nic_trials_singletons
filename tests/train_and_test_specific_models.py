@@ -61,9 +61,13 @@ if __name__ == "__main__":
     config["csv_val_singles"] = config["csv_val_singles"] + "val_singles" + args.fold + ".csv"
     config["csv_train_singles"] = config["csv_train_singles"] + "train_singles" + args.fold + ".csv"
 
+    if "trained_again" in model_params.keys():
+        pass
+    else:
+        model_params["trained_again"] = False
 
     for row in model_params.itertuples(index=True, name='Pandas'):
-        if ("std" in row.name) or ("overall" in row.name):
+        if ("std" in row.name) or ("overall" in row.name) or row.trained_again:
             continue
         # init data module and inner network
         split_values = row.name.replace(config["data_set"], "")
@@ -123,3 +127,5 @@ if __name__ == "__main__":
         frame_list = [hyperframe, result]
         hyperframe = pd.concat(frame_list, ignore_index=True)
         hyperframe.to_csv(hyperframe_path)
+        model_params.set_value(row.Index, "trained_again", True)
+        model_params.to_csv(args.config_path + args.model_params)
