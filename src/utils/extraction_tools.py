@@ -71,7 +71,7 @@ if __name__ == "__main__":
     parser.add_argument('--experiment_name', default='chestxray',
                         help='name of the subfolder structure')
     parser.add_argument('--key_list', nargs='+', default=["learning_rate", "weight_decay",
-                                         "neg_margin", "pos_margin", "result"],
+                                         "neg_margin", "pos_margin", "req_epochs", "result"],
                         help='list of keys to extract')
 
     parser.add_argument('--result_folder', default='./results/',

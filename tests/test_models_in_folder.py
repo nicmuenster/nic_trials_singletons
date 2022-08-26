@@ -19,7 +19,7 @@ import argparse
 def main():
     parser = argparse.ArgumentParser('Singleton Retrieval Testing Setup')
     parser.add_argument('--config_path', default='./', help='the path where the config files are stored')
-    parser.add_argument('--config', default='config.json',
+    parser.add_argument('--config', default='test_config.json',
                         help='the hyper-parameter configuration and experiment settings')
     args = parser.parse_args()
     print('Arguments:\n' + '--config_path: ' + args.config_path + '\n--config: ' + args.config)
@@ -55,7 +55,7 @@ def main():
             metrics_dict[metric_key].append(current_metrics[metric_key])
 
     result = pd.DataFrame(metrics_dict)
-    result.to_csv("./test_results.csv")
+    result.to_csv("./test_results_best_training.csv")
 
 if __name__ == "__main__":
     main()
