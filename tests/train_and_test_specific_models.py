@@ -127,5 +127,5 @@ if __name__ == "__main__":
         frame_list = [hyperframe, result]
         hyperframe = pd.concat(frame_list, ignore_index=True)
         hyperframe.to_csv(hyperframe_path)
-        model_params.set_value(row.Index, "trained_again", True)
+        model_params.at[row.Index, "trained_again"] = True
         model_params.to_csv(args.config_path + args.model_params)
